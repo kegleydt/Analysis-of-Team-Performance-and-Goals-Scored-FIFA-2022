@@ -1,0 +1,52 @@
+---
+title: "Case Study"
+subtitle: "2022 FIFA World Cup — preliminary statistical analysis plan"
+---
+
+## Question and audience
+
+**Research question:** How well can we predict the number of goals scored by a soccer team in a match from shots, completed passes, corner kicks, fouls committed, and completed dribbles?
+
+**Audience:** Soccer fans, coaches, and managers who want to understand which recorded match statistics are most strongly associated with goal scoring.
+
+## Dataset and unit of analysis
+
+The study uses **StatsBomb Open Data** for the **2022 FIFA World Cup**. StatsBomb records event-level match information, including event type, time, team, player, and event-specific outcomes. We plan to aggregate those events to **one observation per team per match**.
+
+Source: [StatsBomb open-data information](https://statsbomb.com/media-pack/).
+
+## Response and predictors
+
+| Role | Variable | Team-match definition |
+|:--|:--|:--|
+| Response | Goals | Number of shots recorded as goals |
+| Predictor | Shots | Total shot events |
+| Predictor | Completed passes | Pass events without an unsuccessful outcome |
+| Predictor | Corners | Pass events classified as corner kicks |
+| Predictor | Fouls | Foul-committed events |
+| Predictor | Completed dribbles | Dribble events classified as completed |
+
+## Proposed baseline model
+
+We begin with multiple linear regression:
+
+$$
+\mathrm{Goals} = \beta_0 + \beta_1(\mathrm{Shots}) + \beta_2(\mathrm{CompletedPasses}) + \beta_3(\mathrm{Corners}) + \beta_4(\mathrm{Fouls}) + \beta_5(\mathrm{CompletedDribbles}) + \varepsilon.
+$$
+
+The original proposal includes R code to download match-event data, calculate team-match variables, plot the marginal associations, and fit the baseline model. The source is retained in `source/original_proposal.qmd` in the repository.
+
+## Proposed analyses
+
+1. Examine scatterplots and the relationship of each predictor with goals.
+2. Fit the baseline multiple linear regression model.
+3. Examine residuals, influential observations, and multicollinearity.
+4. Compare the baseline with LASSO and ridge regression using cross-validation; consider a count-response model such as Poisson regression if assumptions justify it.
+
+## Important limitations
+
+This is an observational dataset: coefficients describe **associations**, not causal effects. Goals are nonnegative counts, so ordinary least squares assumptions may be imperfect. Related attacking statistics could also be correlated with each other. Results from the 2022 World Cup may not generalize to other levels of soccer.
+
+## Work in progress
+
+The project is **not final**. We have not published final figures, diagnostic results, predictive performance comparisons, or conclusions on this page.
