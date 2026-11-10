@@ -1,1 +1,0 @@
-# Analysis-of-Team-Performance-and-Goals-Scored-FIFA-2022
