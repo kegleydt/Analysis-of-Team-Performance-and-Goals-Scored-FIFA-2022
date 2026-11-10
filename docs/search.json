@@ -1,0 +1,128 @@
+[
+  {
+    "objectID": "ai-use.html",
+    "href": "ai-use.html",
+    "title": "AI Use and Verification Plan",
+    "section": "",
+    "text": "AI has helped with debugging R code, improving wording,correcting spelling, and helping with HTML code. Our group is responsible for reviewing research questions, data choices, predictors, and final modeling decisions."
+  },
+  {
+    "objectID": "ai-use.html#how-ai-has-been-used",
+    "href": "ai-use.html#how-ai-has-been-used",
+    "title": "AI Use and Verification Plan",
+    "section": "",
+    "text": "AI has helped with debugging R code, improving wording,correcting spelling, and helping with HTML code. Our group is responsible for reviewing research questions, data choices, predictors, and final modeling decisions."
+  },
+  {
+    "objectID": "ai-use.html#proposed-ai-assisted-extension",
+    "href": "ai-use.html#proposed-ai-assisted-extension",
+    "title": "AI Use and Verification Plan",
+    "section": "Proposed AI-assisted extension",
+    "text": "Proposed AI-assisted extension\nCompare ridge and LASSO regression with our baseline multiple linear regression model. We plan to explore whether shrinkage improves prediction and helps with correlated predictors such as shots, passes, corners, and dribbles. If feasible, we will use repeated cross-validation to assess out-of-sample performance.\nAny code or methods suggested by AI will be treated as provisional until we review and test them."
+  },
+  {
+    "objectID": "ai-use.html#two-planned-verification-checks",
+    "href": "ai-use.html#two-planned-verification-checks",
+    "title": "AI Use and Verification Plan",
+    "section": "Two planned verification checks",
+    "text": "Two planned verification checks\n1. Independently inspect the code and the data pipeline. We will check AI-suggested R code against the documentation for the relevant packages, confirm that variables are built using the intended StatsBomb event definitions, verify that each team-match is represented once.\n2. Reproduce and compare the model results. We will rerun the proposed extension with a fixed random seed and the same cross-validation splits, compare out-of-sample prediction errors,RSME, with the baseline model, and investigate any unstable or implausible coefficients or predictions. We will not use AI-generated claims as findings without verifying them against the computed results."
+  },
+  {
+    "objectID": "ai-use.html#current-status",
+    "href": "ai-use.html#current-status",
+    "title": "AI Use and Verification Plan",
+    "section": "Current status",
+    "text": "Current status\nThese checks are planned, not yet completed. Final code, diagnostics, results, and any revised AI disclosure will be added as the analysis proceeds."
+  },
+  {
+    "objectID": "source/original_proposal.html",
+    "href": "source/original_proposal.html",
+    "title": "Analysis of Team Performance and Goals Scored",
+    "section": "",
+    "text": "Research Question: How well can we predict the number of goals scored by a soccer team in a match using other measurable match events? In particular, how are shots, completed passes, corner kicks, fouls committed, and completed dribbles associated with goals scored?\nAudience: The intended audience is soccer fans who are interested in understanding the statistics behind team performance. The analysis may also be useful to coaches or managers who want to identify which measurable match statistics are most strongly associated with goal scoring.\nResponse: Goals scored by a team in a match.\nCandidate Predictors: Shots, completed passes, corner kicks, fouls committed, and completed dribbles."
+  },
+  {
+    "objectID": "source/original_proposal.html#question-and-audience",
+    "href": "source/original_proposal.html#question-and-audience",
+    "title": "Analysis of Team Performance and Goals Scored",
+    "section": "",
+    "text": "Research Question: How well can we predict the number of goals scored by a soccer team in a match using other measurable match events? In particular, how are shots, completed passes, corner kicks, fouls committed, and completed dribbles associated with goals scored?\nAudience: The intended audience is soccer fans who are interested in understanding the statistics behind team performance. The analysis may also be useful to coaches or managers who want to identify which measurable match statistics are most strongly associated with goal scoring.\nResponse: Goals scored by a team in a match.\nCandidate Predictors: Shots, completed passes, corner kicks, fouls committed, and completed dribbles."
+  },
+  {
+    "objectID": "source/original_proposal.html#data",
+    "href": "source/original_proposal.html#data",
+    "title": "Analysis of Team Performance and Goals Scored",
+    "section": "Data",
+    "text": "Data\nSource of Data: StatsBomb Open Data: https://statsbomb.com/media-pack/\nPermissions: StatsBomb provides open data to facilitate research and education. StatsBomb asks users to cite StatsBomb as the data source and to use the data responsibly.\nObservational Unit: One team in one match. Each row of the analysis data set represents a team’s summarized performance in a single 2022 FIFA World Cup match.\nResponse and Candidate Predictors: The response variable is the number of goals scored by the team. The candidate predictors are the team’s number of shots, completed passes, corner kicks, fouls committed, and completed dribbles during the match.\nCollection Process: StatsBomb records event-level data from professional soccer matches. Events include a time stamp, event type, team, player, period, location, and other event-specific information. We aggregate those event-level observations to the team-match level so that each team’s match statistics can be used to predict goals scored.\nBecause the data come from professional matches rather than a randomized experiment, this is an observational study. The analysis can describe associations and predictive relationships, but it cannot establish that any predictor causes a team to score more goals. The data are publicly released professional-match data, so there is little privacy concern for this analysis. However, event coding and definitions may introduce measurement differences, and results from the 2022 FIFA World Cup may not generalize to amateur, youth, club-league, or other levels of soccer.\n\n\nShow code\nlibrary(tidyverse)\nlibrary(StatsBombR)\n\n# Get only the 2022 FIFA World Cup competition.\nComps360 &lt;- FreeCompetitions() |&gt;\n  filter(\n    competition_name == \"FIFA World Cup\",\n    season_name == \"2022\"\n  )\n\n# Get matches from that competition.\nMatches360 &lt;- FreeMatches(Comps360)\n\n# Only import the event data needed for the model.\n# No StatsBomb 360 data are downloaded because they are not needed here.\nStatsBombModel &lt;- free_allevents(\n  MatchesDF = Matches360,\n  Parallel = TRUE\n) |&gt;\n  allclean()\n\n# Aggregate event-level data to one row per team per match.\nteam_match &lt;- StatsBombModel |&gt;\n  group_by(match_id, team.name) |&gt;\n  summarise(\n    completed_passes = sum(\n      type.name == \"Pass\" & is.na(pass.outcome.name),\n      na.rm = TRUE\n    ),\n    shots = sum(\n      type.name == \"Shot\",\n      na.rm = TRUE\n    ),\n    corners = sum(\n      type.name == \"Pass\" & pass.type.name == \"Corner\",\n      na.rm = TRUE\n    ),\n    fouls = sum(\n      type.name == \"Foul Committed\",\n      na.rm = TRUE\n    ),\n    completed_dribbles = sum(\n      type.name == \"Dribble\" & dribble.outcome.name == \"Complete\",\n      na.rm = TRUE\n    ),\n    goals = sum(\n      type.name == \"Shot\" & shot.outcome.name == \"Goal\",\n      na.rm = TRUE\n    ),\n    .groups = \"drop\"\n  )\n\n# Dimensions of the analysis data.\ndim(team_match)\n\n# Preview the finished team-match data.\nhead(team_match)"
+  },
+  {
+    "objectID": "source/original_proposal.html#one-useful-first-look",
+    "href": "source/original_proposal.html#one-useful-first-look",
+    "title": "Analysis of Team Performance and Goals Scored",
+    "section": "One useful first look",
+    "text": "One useful first look\n\n\nShow code\n# Put all five predictors into long format so they can be shown in one figure.\nplot_data &lt;- team_match |&gt;\n  pivot_longer(\n    cols = c(\n      shots,\n      completed_passes,\n      corners,\n      fouls,\n      completed_dribbles\n    ),\n    names_to = \"predictor\",\n    values_to = \"value\"\n  ) |&gt;\n  mutate(\n    predictor = recode(\n      predictor,\n      shots = \"Shots\",\n      completed_passes = \"Completed passes\",\n      corners = \"Corner kicks\",\n      fouls = \"Fouls committed\",\n      completed_dribbles = \"Completed dribbles\"\n    )\n  )\n\nggplot(plot_data, aes(x = value, y = goals)) +\n  geom_point(alpha = 0.55) +\n  geom_smooth(method = \"lm\", se = FALSE) +\n  facet_wrap(~ predictor, scales = \"free_x\") +\n  labs(\n    title = \"Goals Scored Compared with Candidate Match Predictors\",\n    subtitle = \"Each point represents one team in one 2022 FIFA World Cup match\",\n    x = \"Predictor value per team-match\",\n    y = \"Goals scored\"\n  ) +\n  theme_minimal()\n\n\nThe figure compares the marginal relationship between goals and each of the five candidate predictors. Shots are expected to show one of the clearest positive relationships with goals, while the relationships for completed passes, corners, fouls, and completed dribbles may be weaker. Because several predictors describe related aspects of attacking play, multicollinearity may become important when they are included together in the same model."
+  },
+  {
+    "objectID": "source/original_proposal.html#baseline-model",
+    "href": "source/original_proposal.html#baseline-model",
+    "title": "Analysis of Team Performance and Goals Scored",
+    "section": "Baseline model",
+    "text": "Baseline model\n\n\nShow code\ngoal_model &lt;- lm(\n  goals ~ shots + completed_passes + corners + fouls + completed_dribbles,\n  data = team_match\n)\n\nsummary(goal_model)\n\n# Confidence intervals for all model coefficients.\nconfint(goal_model)\n\n# Pull the shots coefficient and its uncertainty for interpretation below.\nshot_estimate &lt;- coef(summary(goal_model))[\"shots\", \"Estimate\"]\nshot_p &lt;- coef(summary(goal_model))[\"shots\", \"Pr(&gt;|t|)\"]\nshot_ci &lt;- confint(goal_model)[\"shots\", ]\n\n\nHolding completed passes, corners, fouls, and completed dribbles constant, one additional shot is associated with an estimated 0.1291063 incrase in goals on average. The 95% confidence interval for this coefficient is 0.0723527399 to 0.185859874, with a p-value of 1.54e-05. Therfore we reject the null hypothesis that the coefficient is zero and conclude that shots are positively associated with goals scored, holding other predictors constant.\nOne limitation of the baseline model is that goals are nonnegative counts and may not satisfy all ordinary least squares assumptions. In addition, predictors such as shots, completed passes, corners, and completed dribbles may be correlated with one another. These issues motivate checking model diagnostics and multicollinearity before choosing a final model."
+  },
+  {
+    "objectID": "source/original_proposal.html#where-the-analysis-could-go",
+    "href": "source/original_proposal.html#where-the-analysis-could-go",
+    "title": "Analysis of Team Performance and Goals Scored",
+    "section": "Where the analysis could go",
+    "text": "Where the analysis could go\n\nWe could use LASSO or ridge regression to determine whether all five predictors contribute useful predictive information. LASSO could shrink less useful coefficients to zero, while ridge regression could be especially helpful if the predictors are strongly correlated. Repeated cross-validation could be used to compare predictive performance with the baseline multiple linear regression. I would think all five predictors would be useful, therefore I would be more inclined to use ridge regression, but I would like to see the results of both methods before making a final decision.\nWe could examine residual plots, influential observations, and multicollinearity. Variance inflation factors could identify predictors that contain overlapping information. If important assumption problems are found, we could consider transformations, interactions, or a count-response model such as Poisson regression and compare its predictive performance with the baseline model.\n\nThese two method families would help determine both which match statistics are most useful for predicting goals and whether the conclusions from the baseline regression are stable."
+  },
+  {
+    "objectID": "source/original_proposal.html#ai-disclosure-and-sources",
+    "href": "source/original_proposal.html#ai-disclosure-and-sources",
+    "title": "Analysis of Team Performance and Goals Scored",
+    "section": "AI disclosure and sources",
+    "text": "AI disclosure and sources\nAI was used to help debug R code, improve wording, organize the proposal, and identify appropriate regression extensions. The research question, data source, predictors, and final modeling decisions were reviewed by the group.\nData Source: StatsBomb Open Data, StatsBomb. https://statsbomb.com/media-pack/"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Analysis of Team Performance and Goals Scored",
+    "section": "",
+    "text": "How well can we predict the number of goals scored by a soccer team in a match using other measurable match events? Specifically, we will consider shots, completed passes, corner kicks, fouls committed, and completed dribbles."
+  },
+  {
+    "objectID": "index.html#our-research-question",
+    "href": "index.html#our-research-question",
+    "title": "Analysis of Team Performance and Goals Scored",
+    "section": "",
+    "text": "How well can we predict the number of goals scored by a soccer team in a match using other measurable match events? Specifically, we will consider shots, completed passes, corner kicks, fouls committed, and completed dribbles."
+  },
+  {
+    "objectID": "index.html#group-members",
+    "href": "index.html#group-members",
+    "title": "Analysis of Team Performance and Goals Scored",
+    "section": "Group members",
+    "text": "Group members\n\nKegley Terry\nMcKay Chandler\nBen Kirkham"
+  },
+  {
+    "objectID": "index.html#data-source",
+    "href": "index.html#data-source",
+    "title": "Analysis of Team Performance and Goals Scored",
+    "section": "Data source",
+    "text": "Data source\nWe use StatsBomb Open Data from matches at the 2022 FIFA World Cup. Our observational unit is one team in one match. The data record professional soccer events, which we will aggregate into team-level match statistics.\nSource: StatsBomb — media pack and open-data information"
+  },
+  {
+    "objectID": "index.html#what-we-are-studying",
+    "href": "index.html#what-we-are-studying",
+    "title": "Analysis of Team Performance and Goals Scored",
+    "section": "What we are studying",
+    "text": "What we are studying\nOur response variable is the number of goals scored by a team in a match. We plan to study associations with five measurable match statistics and use statistical models to assess predictive performance.\nThis is an observational study. Associations do not establish that a particular match event causes goals."
+  },
+  {
+    "objectID": "index.html#explore-the-project",
+    "href": "index.html#explore-the-project",
+    "title": "Analysis of Team Performance and Goals Scored",
+    "section": "Explore the project",
+    "text": "Explore the project\n\nCase study — research design, candidate predictors, and proposed models.\nAI use — how AI has been used, a proposed extension, and two planned verification checks.\n\nCheckpoint status: This is a preliminary project website. Final models, figures, conclusions, and editing are still in progress."
+  }
+]

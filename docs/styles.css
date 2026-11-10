@@ -1,0 +1,14 @@
+/* Shared styling for the Quarto site and the checked-in HTML preview. */
+:root { --ink:#19344c; --mid:#506479; --navy:#102e47; --aqua:#0f7f86; --wash:#f3f7fa; --line:#dce6eb; }
+body { color:var(--ink); background: #fff; }
+a { color:#08777d; }
+a:hover { color:#055a5e; }
+h1,h2,h3 { color:var(--navy); }
+h1 { letter-spacing:-.03em; }
+h2 { margin-top:2.3rem; border-bottom:1px solid var(--line); padding-bottom:.45rem; }
+blockquote { border-left:4px solid var(--aqua); padding:1rem; background:var(--wash); }
+table { width:100%; border-collapse:collapse; margin:1.4rem 0; font-size:.96rem; }
+th,td { border-bottom:1px solid var(--line); padding:.7rem .65rem; text-align:left; }
+th { background:var(--wash); }
+pre { overflow-x:auto; background:#f1f5f8; border-radius:8px; padding:1rem; }
+code { font-size:.92em; }

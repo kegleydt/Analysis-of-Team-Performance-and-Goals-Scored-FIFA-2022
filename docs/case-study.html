@@ -1,0 +1,98 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="STAT 330 soccer team performance and goals project checkpoint"><title>Case Study · STAT 330</title><link rel="stylesheet" href="styles.css"><style>
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.68}header{background:#102e47;color:white}.mast{max-width:990px;margin:auto;padding:1rem 1.25rem;display:flex;gap:1.25rem;justify-content:space-between;align-items:center;flex-wrap:wrap}.brand{font-weight:750;color:white;text-decoration:none;font-size:1.05rem}nav{display:flex;gap:.45rem;flex-wrap:wrap}nav a{color:#d9eef4;text-decoration:none;padding:.35rem .8rem;border-radius:7px}nav a:hover,nav a.active{background:#24536b;color:white}.hero{background:linear-gradient(125deg,#e9f3f6,#f7fafb);border-bottom:1px solid #dce6eb}.hero-inner{max-width:990px;margin:auto;padding:3rem 1.25rem 2.6rem}.eyebrow{color:#14747a;text-transform:uppercase;letter-spacing:.12em;font-size:.8rem;font-weight:800}.hero h1{font-size:clamp(2rem,4.7vw,3.15rem);line-height:1.17;max-width:800px;margin:.65rem 0;color:#102e47}.hero p{margin:0;color:#506479;font-size:1.12rem}main{max-width:990px;margin:0 auto;padding:1.2rem 1.25rem 4rem;min-height:48vh}main p,main li{max-width:850px}main a{overflow-wrap:anywhere}footer{background:#f3f7fa;border-top:1px solid #dce6eb;text-align:center;color:#506479;font-size:.88rem;padding:1.5rem}@media(max-width:550px){.mast{align-items:flex-start}.hero-inner{padding-top:2rem}table{display:block;overflow-x:auto}}
+</style></head><body><header><div class="mast"><a class="brand" href="index.html">⚽ Soccer Goals | STAT 330</a><nav aria-label="Main navigation"><a href="index.html" >Home</a><a href="case-study.html" class="active">Case Study</a><a href="ai-use.html" >AI Use</a></nav></div></header><div class="hero"><div class="hero-inner"><div class="eyebrow">STAT 330 / Project Checkpoint</div><h1>Case Study</h1><p>2022 FIFA World Cup — preliminary statistical analysis plan</p></div></div><main><h2 id="question-and-audience">Question and audience</h2>
+<p><strong>Research question:</strong> How well can we predict the
+number of goals scored by a soccer team in a match from shots, completed
+passes, corner kicks, fouls committed, and completed dribbles?</p>
+<p><strong>Audience:</strong> Soccer fans, coaches, and managers who
+want to understand which recorded match statistics are most strongly
+associated with goal scoring.</p>
+<h2 id="dataset-and-unit-of-analysis">Dataset and unit of analysis</h2>
+<p>The study uses <strong>StatsBomb Open Data</strong> for the
+<strong>2022 FIFA World Cup</strong>. StatsBomb records event-level
+match information, including event type, time, team, player, and
+event-specific outcomes. We plan to aggregate those events to
+<strong>one observation per team per match</strong>.</p>
+<p>Source: <a href="https://statsbomb.com/media-pack/">StatsBomb
+open-data information</a>.</p>
+<h2 id="response-and-predictors">Response and predictors</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Role</th>
+<th style="text-align: left;">Variable</th>
+<th style="text-align: left;">Team-match definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Response</td>
+<td style="text-align: left;">Goals</td>
+<td style="text-align: left;">Number of shots recorded as goals</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Predictor</td>
+<td style="text-align: left;">Shots</td>
+<td style="text-align: left;">Total shot events</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Predictor</td>
+<td style="text-align: left;">Completed passes</td>
+<td style="text-align: left;">Pass events without an unsuccessful
+outcome</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Predictor</td>
+<td style="text-align: left;">Corners</td>
+<td style="text-align: left;">Pass events classified as corner
+kicks</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Predictor</td>
+<td style="text-align: left;">Fouls</td>
+<td style="text-align: left;">Foul-committed events</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Predictor</td>
+<td style="text-align: left;">Completed dribbles</td>
+<td style="text-align: left;">Dribble events classified as
+completed</td>
+</tr>
+</tbody>
+</table>
+<h2 id="proposed-baseline-model">Proposed baseline model</h2>
+<p>We begin with multiple linear regression:</p>
+<p><span
+class="math display">Goals = <em>β</em><sub>0</sub> + <em>β</em><sub>1</sub>(Shots) + <em>β</em><sub>2</sub>(CompletedPasses) + <em>β</em><sub>3</sub>(Corners) + <em>β</em><sub>4</sub>(Fouls) + <em>β</em><sub>5</sub>(CompletedDribbles) + <em>ε</em>.</span></p>
+<p>The original proposal includes R code to download match-event data,
+calculate team-match variables, plot the marginal associations, and fit
+the baseline model. The source is retained in
+<code>source/original_proposal.qmd</code> in the repository.</p>
+<h2 id="proposed-analyses">Proposed analyses</h2>
+<ol type="1">
+<li>Examine scatterplots and the relationship of each predictor with
+goals.</li>
+<li>Fit the baseline multiple linear regression model.</li>
+<li>Examine residuals, influential observations, and
+multicollinearity.</li>
+<li>Compare the baseline with LASSO and ridge regression using
+cross-validation; consider a count-response model such as Poisson
+regression if assumptions justify it.</li>
+</ol>
+<h2 id="important-limitations">Important limitations</h2>
+<p>This is an observational dataset: coefficients describe
+<strong>associations</strong>, not causal effects. Goals are nonnegative
+counts, so ordinary least squares assumptions may be imperfect. Related
+attacking statistics could also be correlated with each other. Results
+from the 2022 World Cup may not generalize to other levels of
+soccer.</p>
+<h2 id="work-in-progress">Work in progress</h2>
+<p>The project is <strong>not final</strong>. We have not published
+final figures, diagnostic results, predictive performance comparisons,
+or conclusions on this page.</p>
+</main><footer>STAT 330 · 2022 FIFA World Cup · StatsBomb Open Data</footer></body></html>
